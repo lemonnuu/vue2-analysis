@@ -29,20 +29,21 @@ const aliases = require('./alias')
 const resolve = p => {
   const base = p.split('/')[0]
   if (aliases[base]) {
-    return path.resolve(aliases[base], p.slice(base.length + 1))
+    return path.resolve(aliases[base], p.slice(base.length + 1)) //  Mochi: 下面传入的 entry, 实际为打包的入口 
   } else {
-    return path.resolve(__dirname, '../', p)
+    return path.resolve(__dirname, '../', p) // Mochi: 下面传入的 dest, 实际为拼接输出的路径 
   }
 }
 
+// Mochi: 打包配置
 const builds = {
   // Runtime only (CommonJS). Used by bundlers e.g. Webpack & Browserify
   'web-runtime-cjs-dev': {
-    entry: resolve('web/entry-runtime.js'),
-    dest: resolve('dist/vue.runtime.common.dev.js'),
-    format: 'cjs',
+    entry: resolve('web/entry-runtime.js'), // Mochi: enrty 入口
+    dest: resolve('dist/vue.runtime.common.dev.js'), // Mochi: output 输出口
+    format: 'cjs', // Mochi: 打包生成的代码采取哪种模块化
     env: 'development',
-    banner
+    banner // Mochi； 打包生成文件最上部的注释
   },
   'web-runtime-cjs-prod': {
     entry: resolve('web/entry-runtime.js'),
@@ -213,6 +214,7 @@ const builds = {
   }
 }
 
+// Mochi: 将上面的 builds 转化为 rollup 所认的配置, Vue 源码基于 rollup 构建
 function genConfig (name) {
   const opts = builds[name]
   const config = {
@@ -267,5 +269,5 @@ if (process.env.TARGET) {
   module.exports = genConfig(process.env.TARGET)
 } else {
   exports.getBuild = genConfig
-  exports.getAllBuilds = () => Object.keys(builds).map(genConfig)
+  exports.getAllBuilds = () => Object.keys(builds).map(genConfig) // Mochi: 导出所有配置
 }
